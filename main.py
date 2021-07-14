@@ -10,8 +10,8 @@ times = [0]
 path = "C:\\Users\\Zander\\Desktop\\roulette\\resources\\"
 fileIn = "spin5"
 fileOut = "outputArr.txt"
-extention = ".mp4"
-cap = cv2.VideoCapture(path + fileIn + extention)
+extension = ".mp4"
+cap = cv2.VideoCapture(path + fileIn + extension)
 
 UI = False
 
@@ -54,9 +54,9 @@ def overlay(frame):
 	height, width, channels = frame.shape
 
 	# trim frame
-	trim_tl = (0, 20)  # xy
-	trim_br = (width, height - 10)  # xy
-	frame = frame[trim_tl[1]:trim_br[1], trim_tl[0]:trim_br[0]]  # yyxx
+	trim_tl = (0, 20)  # x y
+	trim_br = (width, height - 10)  # x y
+	frame = frame[trim_tl[1]:trim_br[1], trim_tl[0]:trim_br[0]]  # y y x x
 
 	frame = cv2.resize(frame, (width - 90, height))
 
@@ -79,18 +79,18 @@ def overlay(frame):
 def getBall(tmp, last, frame):
 	global timer, ball_arr, times, on
 
-	subed = tmp
+	subbed = tmp
 	height, width, z = tmp.shape
 	inner = int(height * 0.435)
 
 	# fill inner circle
-	subed = cv2.circle(subed, center, inner, (0, 0, 0), -1)
-	subed = cv2.subtract(subed, last)  # get change between frames (moving)
+	subbed = cv2.circle(subbed, center, inner, (0, 0, 0), -1)
+	subbed = cv2.subtract(subbed, last)  # get change between frames (moving)
 
-	# conv to grey, blue to get bigger items, get brightest point
-	subed = cv2.cvtColor(subed, cv2.COLOR_RGB2GRAY)
-	subed = cv2.GaussianBlur(subed, (21, 21), 0)
-	limit = subed.max()
+	# convert to grey, blue to get bigger items, get brightest point
+	subbed = cv2.cvtColor(subbed, cv2.COLOR_RGB2GRAY)
+	subbed = cv2.GaussianBlur(subbed, (21, 21), 0)
+	limit = subbed.max()
 
 	# rangeT from brightest point that may be ball
 	range_t = 20
@@ -104,16 +104,16 @@ def getBall(tmp, last, frame):
 	else:
 		lower = int(limit / 2)
 
-	subed = cv2.inRange(subed, np.array([int(lower)]), np.array([upper]))
-	cv2.findNonZero(subed)  # list of all non 0 points
-	contours, hierarchy = cv2.findContours(subed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)  # biggest non zero area
+	subbed = cv2.inRange(subbed, np.array([int(lower)]), np.array([upper]))
+	cv2.findNonZero(subbed)  # list of all non 0 points
+	contours, hierarchy = cv2.findContours(subbed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)  # biggest non zero area
 
 	c = []
 	if len(contours) != 0:
 		# draw in blue the contours that were founded
-		cv2.drawContours(subed, contours, -1, 255, 3)
+		cv2.drawContours(subbed, contours, -1, 255, 3)
 
-		# find the biggest countour (c) by the area
+		# find the biggest contour (c) by the area
 		c = max(contours, key=cv2.contourArea)
 
 	t_q = (0, 0)
@@ -179,7 +179,7 @@ def solve_y(poly, y):
 	return x
 
 
-# noinspection PyTupleAssignmentBalance
+# no inspection PyTupleAssignmentBalance
 def main():
 	global times, ball_arr
 	get_frames()
@@ -265,20 +265,20 @@ def main():
 	print("spins?? =", len(ball_arr_log))
 	print("REVOLUTIONS: = ", res)
 
-	print("angle of fall, relitive to spin start =", (res - math.floor(res)) * 360)
+	print("angle of fall, relative to spin start =", (res - math.floor(res)) * 360)
 
 	plt.show()
 
 
 main()
 
-# need to find the equilizer speed. aka the speed it is going when it crosses its final number.
-# ^^ could be done with equilizer point on rim, to calculate langing point later
-# ^^ this is probably better as it takes bounce varience out of it. just add a typical bounce distance
+# need to find the equaliser speed. aka the speed it is going when it crosses its final number.
+# ^^ could be done with equaliser point on rim, to calculate landing point later
+# ^^ this is probably better as it takes bounce variance out of it. just add a typical bounce distance
 #
-# rmp = rmp ball + rpm inner
+# rpm = rpm ball + rpm inner
 # start = 0 = green - x
-# finish = +- y (green - x, realitive at fall) ?? or do you just take the num where it ends
+# finish = +- y (green - x, relative at fall) ?? or do you just take the num where it ends
 #
 # ball drop @ avg - 30ms, or just lowest found speed
 # see how well different runs line up with same drop point

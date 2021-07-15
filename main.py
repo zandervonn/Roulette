@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 import math
-from scipy.integrate import quad
 
 vid = []
 orgVid = []
@@ -21,18 +20,6 @@ center = (550, 360)
 fRate = 30
 timer = 0
 on = False
-
-
-def write(arr):
-	text_file = open(path + fileOut, "w")
-	i = 1
-	for element in arr:
-
-		text_file.write('[' + str(int(element)) + '],')
-		if i % 4 == 0:
-			text_file.write('\n')
-		i = i + 1
-	text_file.close()
 
 
 def get_frames():
@@ -119,7 +106,7 @@ def getBall(tmp, last, frame):
 	t_q = (0, 0)
 	t_a = 360
 
-	# get farthest clockwise point in contour
+	# get farthest clockwise point in contour = t _ a
 	if c is not None and len(c) > 1:
 		for x in c:
 			for p in x:
@@ -168,17 +155,6 @@ def key(k):
 	if cv2.waitKey(25) & 0xFF == ord(k):
 		return True
 
-
-def solve_y(poly, y):
-	poly_arr = poly.c
-	if len(poly_arr) != 2:
-		return 0
-
-	x = y - poly_arr[1]
-	x = x / poly_arr[0]
-	return x
-
-
 # no inspection PyTupleAssignmentBalance
 def main():
 	global times, ball_arr
@@ -199,99 +175,19 @@ def main():
 
 		i = i + 1
 
-	times = []
+	ball_arr = ball_arr[3:-1]
+
 	times = [x for x in range(len(ball_arr))]
-
-	ball_arr.pop(0)
-	times.pop(0)
-
-	ball_arr_log = [math.log(x, e) for x in ball_arr if x > 0]
-	best_fit = np.poly1d(np.polyfit(times, ball_arr_log, 1))
-
-	write(ball_arr)
-
-	total = 0
-	i = 0
-	while i < len(ball_arr_log) - 1:
-		total += abs(ball_arr_log[i] - best_fit(times[i]))
-		i = i + 1
-	avg = total / len(ball_arr_log)
-
-	range_t = 0.5
-
-	while True:
-		i = 0
-		print("pop bottom", len(ball_arr_log), "i = ", i, " guess = ", best_fit(times[i]), " real = ", ball_arr_log[i], "avg = ", avg * range_t)
-		if best_fit(times[i]) - (avg * range_t) > ball_arr_log[i] or best_fit(times[i]) + (avg * range_t) < ball_arr_log[i]:
-			ball_arr_log.pop(i)
-			times.pop(i)
-
-		else:
-			break
-
-	while True:
-		i = len(ball_arr_log) - 1
-		print("pop top", len(ball_arr_log), "i = ", i, " guess = ", best_fit(times[i]), " real = ", ball_arr_log[i], "avg = ", avg * range_t)
-		if best_fit(times[i]) - (avg * range_t) > ball_arr_log[i] or best_fit(times[i]) + (avg * range_t) < ball_arr_log[i]:
-			ball_arr_log.pop(i)
-			times.pop(i)
-
-		else:
-			break
-
-	# build_graph
-
-	# ball_arr_log = [(1000/(2.71828 ** x)) for x in ball_arr_log]
-
 	lower = times[0]
 	times = [x - lower for x in times]
 	time_total = times[len(times) - 1]
-	best_fit = np.poly1d(np.polyfit(times, ball_arr_log, 1))
+	best_fit = np.poly1d(np.polyfit(times, ball_arr, 3))
 
-	# print("Best fit:\t", best_fit , "\t/best fit")
 	import matplotlib.pyplot as plt
 	xp = np.linspace(0, time_total, time_total)
-	_ = plt.plot(times, ball_arr_log, '.', xp, best_fit(xp))
-
-	# print("rps start = ", (best_fit(0)))
-	print("rps start = ", 1 / (e ** best_fit(0)))
-	# print("rps at fall = ", (best_fit(len(ball_arr_log))))
-	print("rps at fall = ", 1 / (e ** best_fit(len(ball_arr_log))))
-
-	def f(x):
-		return 1 / (e ** best_fit(x))
-
-	res, err = quad(f, 0, time_total)
-	print("spins?? =", len(ball_arr_log))
-	print("REVOLUTIONS: = ", res)
-
-	print("angle of fall, relative to spin start =", (res - math.floor(res)) * 360)
+	_ = plt.plot(times, ball_arr, '.', xp, best_fit(xp))
 
 	plt.show()
 
 
 main()
-
-# need to find the equaliser speed. aka the speed it is going when it crosses its final number.
-# ^^ could be done with equaliser point on rim, to calculate landing point later
-# ^^ this is probably better as it takes bounce variance out of it. just add a typical bounce distance
-#
-# rpm = rpm ball + rpm inner
-# start = 0 = green - x
-# finish = +- y (green - x, relative at fall) ?? or do you just take the num where it ends
-#
-# ball drop @ avg - 30ms, or just lowest found speed
-# see how well different runs line up with same drop point
-#
-# angle past check mod not working??
-
-# 3000
-# 8000
-# 21000
-# 55000
-# 150000
-# 400000
-# 1000000
-# 2800000
-# 7000000
-# 18500000

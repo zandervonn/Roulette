@@ -123,8 +123,9 @@ def getBall(tmp, last, frame):
 				ttt = (frame * fRate) - times[-1:][0]
 				mod = (t_a / 360) - (lower / 360)
 				out = ttt + (ttt * mod)  # time + 1.x, x% way past 180
-				print("180+.. time = ", int(ttt), " mod = %", int(100 * mod), " out = ", int(out))
+				print("Time = ", int(ttt), "-", times[-1:][0], "mod = %", int(100 * mod), " out = ", int(out))
 				ball_arr.append(out)
+				times.append(frame * fRate)
 
 			on = True
 
@@ -175,13 +176,32 @@ def main():
 
 		i = i + 1
 
-	ball_arr = ball_arr[3:-1]
-
+	ball_arr = ball_arr[5:-1]
+	times = []
 	times = [x for x in range(len(ball_arr))]
 	lower = times[0]
 	times = [x - lower for x in times]
 	time_total = times[len(times) - 1]
-	best_fit = np.poly1d(np.polyfit(times, ball_arr, 3))
+	ball_arr = [1/(x/1000) for x in ball_arr] #RPS
+	best_fit = np.poly1d(np.polyfit(times, ball_arr, 2))
+
+
+	decel = 0.20429411764706 #https://www.calculatorsoup.com/calculators/physics/velocity-calculator-vuas.php
+	val = float(best_fit.c[0])
+	print("\n \n-deceleration = v \n", best_fit) #### deceleration per rotation, not per second??
+	print("true decel    = ", decel)
+	print("-start speed = ", best_fit(0))
+	print("-end speed = ", best_fit(len(times)))
+	print("==True rotations = ", len(times))
+
+	# d = v^2 / 2a
+	# distance = ((best_fit(0) ** 2) - (best_fit(len(times)) ** 2)) / (2 * (1 - val) * best_fit(0))
+	distance = ((best_fit(0) ** 2) - (best_fit(len(times)) ** 2)) / (2*(decel))
+
+	print("==Total distance = ", distance)
+
+
+
 
 	import matplotlib.pyplot as plt
 	xp = np.linspace(0, time_total, time_total)

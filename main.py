@@ -2,24 +2,28 @@ import numpy as np
 import cv2
 import math
 
-vid = []
-orgVid = []
-ball_arr = [0]
-times = [0]
-path = "C:\\Users\\Zander\\Desktop\\roulette\\resources\\"
+# Finals
+path = "C:\\Users\\Zander\\IdeaProjects\\roulette2\\Resources\\"
+# path = "C:\\Users\\Zander\\Desktop\\roulette\\resources\\"
 fileIn = "spin5"
 fileOut = "outputArr.txt"
 extension = ".mp4"
 cap = cv2.VideoCapture(path + fileIn + extension)
-
-UI = False
-
 e = 2.71828
-
 center = (550, 360)
 fRate = 30
+
+# variables
+vid = []
+orgVid = []
+ball_arr = [0]
+times = [0]
 timer = 0
 on = False
+
+# run setup
+UI = False
+scan_vid = True
 
 
 def get_frames():
@@ -35,6 +39,18 @@ def get_frames():
 
 		else:
 			break
+
+
+def write(arr):
+	text_file = open(path + fileOut, "w")
+	i = 1
+	for element in arr:
+
+		text_file.write('[' + str(element) + '],')
+		if i % 4 == 0:
+			text_file.write('\n')
+		i = i + 1
+	text_file.close()
 
 
 def overlay(frame):
@@ -156,25 +172,44 @@ def key(k):
 	if cv2.waitKey(25) & 0xFF == ord(k):
 		return True
 
+
+def deg_to_cardinal(d):
+	dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+	ix = round(d / (360. / len(dirs)))
+	return dirs[ix % 16]
+
+
 # no inspection PyTupleAssignmentBalance
 def main():
 	global times, ball_arr
 	get_frames()
 
-	i = 0
-	while i < len(vid) - 1:
-		if i > 0:  # skip early frames
-			vid[i].copy()
+	if scan_vid:
+		i = 0
+		while i < len(vid) - 1:
+			if i > 0:  # skip early frames
+				vid[i].copy()
 
-			b = getBall(vid[i], vid[i - 1], i + 1)
+				b = getBall(vid[i], vid[i - 1], i + 1)
 
-			cv2.circle(orgVid[i], (int(b[0]), int(b[1])), 5, (100, 255, 50), -1)
+				cv2.circle(orgVid[i], (int(b[0]), int(b[1])), 5, (100, 255, 50), -1)
 
-			if UI:
-				cv2.imshow("Display", orgVid[i])
-				cv2.waitKey(int(1000 / fRate))  # sync frame rate
+				if UI:
+					cv2.imshow("Display", orgVid[i])
+					cv2.waitKey(int(1000 / fRate))  # sync frame rate
 
-		i = i + 1
+			i = i + 1
+
+		write(ball_arr)
+
+	else:
+		with open(path + fileOut, 'r') as fd:
+			for row in fd:
+				lines = row.split(',')
+				lines = lines[0:-1]
+				lines = [float(x[1:-1]) for x in lines]
+				ball_arr = ball_arr + lines
+		ball_arr = ball_arr[1:]
 
 	ball_arr = ball_arr[5:-1]
 	times = []
@@ -182,13 +217,12 @@ def main():
 	lower = times[0]
 	times = [x - lower for x in times]
 	time_total = times[len(times) - 1]
-	ball_arr = [1/(x/1000) for x in ball_arr] #RPS
+	ball_arr = [1 / (x / 1000) for x in ball_arr]  # RPS
 	best_fit = np.poly1d(np.polyfit(times, ball_arr, 2))
 
-
-	decel = 0.20429411764706 #https://www.calculatorsoup.com/calculators/physics/velocity-calculator-vuas.php
+	decel = 0.20429411764706  # https://www.calculatorsoup.com/calculators/physics/velocity-calculator-vuas.php
 	val = float(best_fit.c[0])
-	print("\n \n-deceleration = v \n", best_fit) #### deceleration per rotation, not per second??
+	print("\n \n-deceleration = v \n", best_fit)
 	print("true decel    = ", decel)
 	print("-start speed = ", best_fit(0))
 	print("-end speed = ", best_fit(len(times)))
@@ -196,16 +230,15 @@ def main():
 
 	# d = v^2 / 2a
 	# distance = ((best_fit(0) ** 2) - (best_fit(len(times)) ** 2)) / (2 * (1 - val) * best_fit(0))
-	distance = ((best_fit(0) ** 2) - (best_fit(len(times)) ** 2)) / (2*(decel))
+	distance = ((best_fit(0) ** 2) - (best_fit(len(times)) ** 2)) / (2 * (decel))
 
 	print("==Total distance = ", distance)
-
-
-
+	print("deg = ", 360 * (distance - math.floor(distance)))
+	print("cords= ", deg_to_cardinal(360 * (distance - math.floor(distance))))
 
 	import matplotlib.pyplot as plt
 	xp = np.linspace(0, time_total, time_total)
-	_ = plt.plot(times, ball_arr, '.', xp, best_fit(xp))
+	plt.plot(times, ball_arr, '.', xp, best_fit(xp))
 
 	plt.show()
 

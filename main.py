@@ -1,11 +1,13 @@
 import numpy as np
+from scipy import optimize
 import cv2
 import math
+import matplotlib.pyplot as plt
 
 # Finals
 path = "C:\\Users\\Zander\\IdeaProjects\\roulette2\\Resources\\"
 # path = "C:\\Users\\Zander\\Desktop\\roulette\\resources\\"
-fileIn = "spin5"
+fileIn = "spin3"
 fileOut = "outputArr.txt"
 extension = ".mp4"
 cap = cv2.VideoCapture(path + fileIn + extension)
@@ -23,7 +25,7 @@ on = False
 
 # run setup
 UI = False
-scan_vid = True
+scan_vid = False
 
 
 def get_frames():
@@ -217,30 +219,35 @@ def main():
 	lower = times[0]
 	times = [x - lower for x in times]
 	time_total = times[len(times) - 1]
-	ball_arr = [1 / (x / 1000) for x in ball_arr]  # RPS
-	best_fit = np.poly1d(np.polyfit(times, ball_arr, 2))
+	times = np.array(times)
 
-	decel = 0.20429411764706  # https://www.calculatorsoup.com/calculators/physics/velocity-calculator-vuas.php
-	val = float(best_fit.c[0])
-	print("\n \n-deceleration = v \n", best_fit)
-	print("true decel    = ", decel)
-	print("-start speed = ", best_fit(0))
-	print("-end speed = ", best_fit(len(times)))
-	print("==True rotations = ", len(times))
+	f_speed = 0.34
 
-	# d = v^2 / 2a
-	# distance = ((best_fit(0) ** 2) - (best_fit(len(times)) ** 2)) / (2 * (1 - val) * best_fit(0))
-	distance = ((best_fit(0) ** 2) - (best_fit(len(times)) ** 2)) / (2 * (decel))
+	ball_arr = [(1 / (x / 1000))-f_speed for x in ball_arr]  # RPS over fall speed
+	ball_arr = np.array(ball_arr)
 
-	print("==Total distance = ", distance)
-	print("deg = ", 360 * (distance - math.floor(distance)))
-	print("cords= ", deg_to_cardinal(360 * (distance - math.floor(distance))))
+	def f(x, a, b, c):
+		return (a*(np.abs(x-b))**c) - f_speed
 
-	import matplotlib.pyplot as plt
-	xp = np.linspace(0, time_total, time_total)
-	plt.plot(times, ball_arr, '.', xp, best_fit(xp))
+	params, _ = optimize.curve_fit(f, times, ball_arr, p0=[0.005, 20, 2])
+
+	print(params)
+
+	plt.plot(times,ball_arr, '.')
+	plt.plot(times,f(times, params[0], params[1], params[2]), '-')
 
 	plt.show()
 
 
+
 main()
+
+
+
+
+# QS:
+# how to get polynomial deceleration
+# better to get the integral?
+#   cant get the time because i can take time for rotation and time between
+# how to make ml tracking
+# how to get the right curve shape

@@ -3,30 +3,13 @@ from scipy import optimize
 import cv2
 import math
 import matplotlib.pyplot as plt
+from vars import *
 
-# Finals
-path = "C:\\Users\\Zander\\IdeaProjects\\roulette2\\Resources\\"
-# path = "C:\\Users\\Zander\\Desktop\\roulette\\resources\\"
-fileIn = "spin3"
-fileOut = "outputArr.txt"
-extension = ".mp4"
 cap = cv2.VideoCapture(path + fileIn + extension)
-e = 2.71828
-center = (550, 360)
-fRate = 30
-
-# variables
-vid = []
-orgVid = []
-ball_arr = [0]
-times = [0]
-timer = 0
-on = False
 
 # run setup
 UI = False
 scan_vid = False
-
 
 def get_frames():
 	while cap.isOpened():
@@ -180,8 +163,12 @@ def deg_to_cardinal(d):
 	ix = round(d / (360. / len(dirs)))
 	return dirs[ix % 16]
 
+def solve_y(a,b, y):
 
-# no inspection PyTupleAssignmentBalance
+
+	return x
+
+
 def main():
 	global times, ball_arr
 	get_frames()
@@ -215,30 +202,42 @@ def main():
 
 	ball_arr = ball_arr[5:-1]
 	times = []
-	times = [x for x in range(len(ball_arr))]
+	times = [-(len(ball_arr) - x) for x in range(len(ball_arr))]
 	lower = times[0]
-	times = [x - lower for x in times]
-	time_total = times[len(times) - 1]
 	times = np.array(times)
 
 	f_speed = 0.34
 
-	ball_arr = [(1 / (x / 1000))-f_speed for x in ball_arr]  # RPS over fall speed
+	ball_arr = [(1 / (x / 1000)) for x in ball_arr]  # RPS over fall speed
 	ball_arr = np.array(ball_arr)
 
-	def f(x, a, b, c):
-		return (a*(np.abs(x-b))**c) - f_speed
+	def f(x, a, b):
+		return a*(np.abs(x-b))**2
 
-	params, _ = optimize.curve_fit(f, times, ball_arr, p0=[0.005, 20, 2])
+	def fy(a, b):
+		return (a*(np.abs(0-b))**2) + f_speed
 
-	print(params)
+	params, _ = optimize.curve_fit(f, times, ball_arr, p0=[0.03,50])
+	a, b = params
+	plt.plot(times, ball_arr, '.')
+	plt.plot(times, f(times, a, b), '-')
 
-	plt.plot(times,ball_arr, '.')
-	plt.plot(times,f(times, params[0], params[1], params[2]), '-')
+	print(a, b)
+	print("start speed = ", f(times[0], a, b))
+	print("time of fall = ", fy(a, b))
+	print("times spinning real = ", len(times))
+	extra_spin = fy(a, b)
+	distance = len(times) + extra_spin
+	print("times spinning = ", distance)
+
+	print("degrees at fall = ", 360 * (distance - math.floor(distance)))
+	print("cords= ", deg_to_cardinal(360 * (distance - math.floor(distance))))
+
+	# from scipy.integrate import quad
+	# integral = quad(f, -(len(times)), fy(a,b), args=(a,b))
+	# print("vs calculated ?? = ", integral)
 
 	plt.show()
-
-
 
 main()
 
@@ -246,8 +245,4 @@ main()
 
 
 # QS:
-# how to get polynomial deceleration
-# better to get the integral?
-#   cant get the time because i can take time for rotation and time between
 # how to make ml tracking
-# how to get the right curve shape

@@ -1,4 +1,8 @@
-
+import numpy as np
+from scipy import optimize
+import cv2
+import math
+import matplotlib.pyplot as plt
 
 # Finals
 path = "C:\\Users\\Zander\\IdeaProjects\\roulette2\\Resources\\"

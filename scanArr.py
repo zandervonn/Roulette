@@ -4,6 +4,7 @@ from vars import *
 import matplotlib.pyplot as plt
 
 angles = []
+times = []
 
 def getChange(arr):
 	out =[]
@@ -57,36 +58,10 @@ def clearHighTEMP(arr):
 
 	return out
 
-
-def fixDistortion(vels):
-
-	out = []
-	strength = 0.2
-
-	i = 0
-	for vel in vels:
-		ang = angles[i]
-		distort = 1 + (math.cos(math.radians(ang)) * strength)
-		vel = vel * distort
-		print(vel, "@", ang, " * ", distort, "=", vel)
-
-		i += 1
-
-		out.append(vel)
-
-	return out
-
-
-def toInt(arr):
-	out = [int(x) for x in arr]
-
-	return out
-
-
 def trimSD(arr):
 	out = []
 
-	SDlim = .8
+	SDlim = 1
 
 	i = 0
 	for _ in arr:
@@ -95,7 +70,7 @@ def trimSD(arr):
 		mean = np.mean(arr[i:i+10]) # mean throws error
 
 		for y in arr[i:i+10]:
-			if mean- (std*SDlim) < y < mean+(std*SDlim):
+			if mean - (std*SDlim) < y < mean + (std*SDlim):
 				out.append(y)
 			else:
 				out.append(-1)
@@ -104,19 +79,25 @@ def trimSD(arr):
 
 	return out
 
+def timeForRev(arr,angin):
+	frames = -1
 
-def getLine(arr):
-	out = []
-	outTmp = []
+	j = len(arr)
+	while j > 1:
 
-	i = 0
-	for _ in arr[:-5]:
-		outTmp.append(np.mean(arr[i:i+5]))
+		j = j - 1
+		if arr[j - 1] < angin < arr[j] and arr[j-1] != 0:
+			frames = len(arr) - j
+			break
 
-	for _ in outTmp[:-10]:
-		out.append(np.average(arr[i:i+10]))
+	if 0 < frames < 30:
+		print(frames, " arr ", [int(x) for x in arr[-30:]] , " ang ", int(angin))
 
-	return out
+	return frames
+
+def scan(ang):
+	angles.append(ang)
+	times.append(timeForRev(angles, ang))
 
 
 with open(path + fileOut, 'r') as fd:
@@ -126,31 +107,27 @@ with open(path + fileOut, 'r') as fd:
 		lines = [float(x[1:-1]) for x in lines]
 		ball_arr = ball_arr + lines
 
-angles = ball_arr
+# a = getChange(ball_arr)
+# b = getDirection(a)
+# c = clearNeg(b)
+# d = clearHighTEMP(c)
+# e = timePreRev(d)
 
-a = getChange(ball_arr)
-b = getDirection(a)
-c = clearNeg(b)
-d = clearHighTEMP(c)
-e = fixDistortion(d)
-# f = trimSD(e)
-xx = toInt(b)
 
-displayBefore = d
-displayAfter = e
-#print(display)
+# print(display)
 
-#
-# i = 1
-# while i < len(ball_arr):
-#
-# 	scan(i)
-#
-# 	i += 1
-#
 
-plt.plot([x for x in range(len(displayBefore))], displayBefore, '.', plt.ylim([0, 50]))
-plt.plot([x for x in range(len(displayAfter))], displayAfter, '.', plt.ylim([0, 50]))
+i = 1
+while i < len(ball_arr):
+
+	scan(ball_arr[i])
+
+	i += 1
+
+displayBefore = [x/5 for x in angles]
+displayAfter = trimSD(times)
+plt.plot([x for x in range(len(displayBefore))], displayBefore, '.')
+plt.plot([x for x in range(len(displayAfter))], displayAfter, '.') # , plt.ylim([0, 50])
 # plt.plot(times, [x/10 for x in angles[0:-1]], '-')
 
 plt.show()

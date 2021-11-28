@@ -1,0 +1,180 @@
+ang = ball_arr[i]
+ang = ang + 90
+ang = ang % 360
+ang = math.radians(ang)
+
+dif = math.sin((ang))
+dif = 0.25 * dif
+dif = 1 + dif
+
+
+#########################################################################
+
+
+
+va = (ball_arr[i]-ball_arr[i-1]) * dif
+
+
+	v = ball_arr[i]-ball_arr[i-1]
+	va = np.average(velocities[-13:])
+
+	maxv = 100
+	if maxv > v > -maxv:
+
+		ang = ball_arr[i]
+		dif = 1
+		if not (90 < ang < 270) :
+			ang = ang + 90
+			ang = ang % 360
+			ang = math.radians(ang)
+
+			dif = math.sin((ang))
+			dif = 0.25 * dif
+			dif = 1 + dif
+
+		va = v * dif
+
+		print(dif)
+		velocities.append(v)
+		velocities_adj.append(va)
+
+	if all(x > 0 for x in velocities):
+		ccw += 1
+	if all(x < 0 for x in velocities):
+		cw += 1
+
+	if ccw > cw:
+		print("counter clockwise")
+
+	if ccw < cw:
+		print("clockwise")
+
+
+
+		#############################################
+
+
+velocities = []
+velocities_adj = []
+
+ccw = 0
+cw = 0
+
+def scan(i):
+	global ccw,cw
+
+	ang = ball_arr[i]
+
+	j = i-1
+	while j > 0:
+		buffer = 80
+		if ball_arr[j] > ball_arr[i] > ball_arr[j-1] or ball_arr[j-1] > ball_arr[i] > ball_arr[j]:
+			a = ball_arr[j]
+			b = ball_arr[j-1]
+			v = (i-j) * fRate
+			velocities.append(v)
+			break
+
+		j -= 1
+
+
+def fixDistortionTwo(v, a):
+
+	strength = 0.2
+
+	if 0 < a < 180:
+		a = abs(90-a)  # distance from 90
+		a = a/90  # percentage
+		v = v * (1 + (a * strength))
+
+	return v
+
+def fixDistortion(arr):
+    out = []
+
+    offset = 90
+
+
+    i = 0
+    for v in arr:
+
+        ang = angles[i]
+        ang = ang + offset
+        ang = ang % 360
+        ang = math.radians(ang)
+
+        dif = math.sin(ang)
+        dif = 0.16 * dif
+        dif = 1 + dif
+
+        v = v * dif
+
+        v = fixDistortionTwo(v, angles[i])
+
+        out.append(v)
+
+        i += 1
+
+        # print("for ang", int(angles[i]), "  distort=", dif)
+
+    return out
+
+def fixDistortion(vels):
+
+    out = []
+    strength = 0.2
+
+    i = 0
+    for vel in vels:
+        ang = angles[i]
+        distort = 1 + (math.cos(math.radians(ang)) * strength)
+        vel = vel * distort
+        print(vel, "@", ang, " * ", distort, "=", vel)
+
+        i += 1
+
+        out.append(vel)
+
+    return out
+
+
+def toInt(arr):
+    out = [int(x) for x in arr]
+
+    return out
+
+
+def trimSD(arr):
+    out = []
+
+    SDlim = .8
+
+    i = 0
+    for _ in arr:
+
+        std = np.std(arr[i:i+10])
+        mean = np.mean(arr[i:i+10]) # mean throws error
+
+        for y in arr[i:i+10]:
+            if mean- (std*SDlim) < y < mean+(std*SDlim):
+                out.append(y)
+            else:
+                out.append(-1)
+
+        i += 10
+
+    return out
+
+
+def getLine(arr):
+    out = []
+    outTmp = []
+
+    i = 0
+    for _ in arr[:-5]:
+        outTmp.append(np.mean(arr[i:i+5]))
+
+    for _ in outTmp[:-10]:
+        out.append(np.average(arr[i:i+10]))
+
+    return out

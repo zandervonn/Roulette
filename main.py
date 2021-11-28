@@ -1,15 +1,14 @@
-import numpy as np
-from scipy import optimize
-import cv2
-import math
-import matplotlib.pyplot as plt
+
 from vars import *
 
 cap = cv2.VideoCapture(path + fileIn + extension)
 
+angles = []
+
 # run setup
-UI = False
-scan_vid = False
+UI = 0
+scan_vid = 1
+
 
 def get_frames():
 	while cap.isOpened():
@@ -116,6 +115,7 @@ def getBall(tmp, last, frame):
 					t_q = p
 					t_a = a
 
+		angles.append(t_a)
 		# get when the ball first crosses into angles
 		lower = 200
 		upper = 359
@@ -163,11 +163,6 @@ def deg_to_cardinal(d):
 	ix = round(d / (360. / len(dirs)))
 	return dirs[ix % 16]
 
-def solve_y(a,b, y):
-
-
-	return x
-
 
 def main():
 	global times, ball_arr
@@ -189,7 +184,7 @@ def main():
 
 			i = i + 1
 
-		write(ball_arr)
+		write(angles)
 
 	else:
 		with open(path + fileOut, 'r') as fd:
@@ -217,7 +212,7 @@ def main():
 	def fy(a, b):
 		return (a*(np.abs(0-b))**2) + f_speed
 
-	params, _ = optimize.curve_fit(f, times, ball_arr, p0=[0.03,50])
+	params, _ = optimize.curve_fit(f, times, ball_arr, p0=[0.03, 50])
 	a, b = params
 	plt.plot(times, ball_arr, '.')
 	plt.plot(times, f(times, a, b), '-')
@@ -233,14 +228,14 @@ def main():
 	print("degrees at fall = ", 360 * (distance - math.floor(distance)))
 	print("cords= ", deg_to_cardinal(360 * (distance - math.floor(distance))))
 
-	# from scipy.integrate import quad
-	# integral = quad(f, -(len(times)), fy(a,b), args=(a,b))
-	# print("vs calculated ?? = ", integral)
-
 	plt.show()
 
 main()
 
+# for any point x
+#   v = for all x-1 to x-k
+#       angle change / frames before = velocity
+#       average change in velocity between points
 
 
 

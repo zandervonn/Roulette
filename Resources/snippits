@@ -178,3 +178,77 @@ def getLine(arr):
         out.append(np.average(arr[i:i+10]))
 
     return out
+
+def getChange(arr):
+	out = []
+	i = 1
+	while i < len(ball_arr):
+		dif = ball_arr[i] - ball_arr[i - 1]
+		if dif > 200:
+			dif = 360 - dif
+		if dif < - 200:
+			dif = 360 + dif
+		out.append(dif)
+		i += 1
+
+	return out
+
+
+def getDirection(arr):
+	pos = 0
+	neg = 0
+	for i in arr:
+		if i > 0:
+			pos += 1
+		else:
+			neg += 1
+
+	out = arr
+	if pos < neg:
+		out = [-x for x in arr]  # invert entire array if neg
+
+	print("pos", pos, " neg", neg)
+
+	return out
+
+
+def clearNeg(arr):
+	out = []
+	for i in arr:
+		if i < 0:
+			i = -1
+		out.append(i)
+
+	return out
+
+
+def clearHighTEMP(arr):
+	out = []
+	for i in arr:
+		if i > 100:
+			i = -1
+		out.append(i)
+
+	return out
+
+
+def trimSD(arr):
+	out = []
+
+	SDlim = 1
+
+	i = 0
+	while i < len(arr) - 10:
+
+		std = np.std(arr[i:i + 10])
+		mean = np.mean(arr[i:i + 10])  # mean throws error
+
+		for y in arr[i:i + 10]:
+			if mean - (std * SDlim) < y < mean + (std * SDlim):
+				out.append(y)
+			else:
+				out.append(-1)
+
+		i += 10
+
+	return out

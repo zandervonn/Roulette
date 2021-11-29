@@ -6,11 +6,12 @@ import matplotlib.pyplot as plt
 angles = []
 times = []
 
+
 def getChange(arr):
-	out =[]
+	out = []
 	i = 1
 	while i < len(ball_arr):
-		dif = ball_arr[i]-ball_arr[i-1]
+		dif = ball_arr[i] - ball_arr[i - 1]
 		if dif > 200:
 			dif = 360 - dif
 		if dif < - 200:
@@ -34,10 +35,9 @@ def getDirection(arr):
 	if pos < neg:
 		out = [-x for x in arr]  # invert entire array if neg
 
-	print("pos", pos, " neg",neg)
+	print("pos", pos, " neg", neg)
 
 	return out
-
 
 
 def clearNeg(arr):
@@ -49,6 +49,7 @@ def clearNeg(arr):
 
 	return out
 
+
 def clearHighTEMP(arr):
 	out = []
 	for i in arr:
@@ -58,19 +59,20 @@ def clearHighTEMP(arr):
 
 	return out
 
+
 def trimSD(arr):
 	out = []
 
 	SDlim = 1
 
 	i = 0
-	for _ in arr:
+	while i < len(arr) - 10:
 
-		std = np.std(arr[i:i+10])
-		mean = np.mean(arr[i:i+10]) # mean throws error
+		std = np.std(arr[i:i + 10])
+		mean = np.mean(arr[i:i + 10])  # mean throws error
 
-		for y in arr[i:i+10]:
-			if mean - (std*SDlim) < y < mean + (std*SDlim):
+		for y in arr[i:i + 10]:
+			if mean - (std * SDlim) < y < mean + (std * SDlim):
 				out.append(y)
 			else:
 				out.append(-1)
@@ -79,21 +81,35 @@ def trimSD(arr):
 
 	return out
 
-def timeForRev(arr,angin):
+
+def timeForRev(arr, angin):
 	frames = -1
 
-	j = len(arr)
+	j = len(arr) - 1
+	# for all in array
 	while j > 1:
-
+		# itterate
 		j = j - 1
-		if arr[j - 1] < angin < arr[j] and arr[j-1] != 0:
+
+		# deal with poles on gap bigger than 180
+		if arr[j - 1] - arr[j] > 180 and (arr[j - 1] <= angin < 360 or 0 <= angin < arr[j]):
 			frames = len(arr) - j
 			break
 
-	if 0 < frames < 30:
-		print(frames, " arr ", [int(x) for x in arr[-30:]] , " ang ", int(angin))
+		# find the last occurrence where the value is between
+		if -1 != arr[j - 1] <= angin < arr[j] != -1:
+			frames = len(arr) - j
+			break
+
+		# on -1 aka error
+		if -1 == arr[j] and arr[j-1] <= angin < arr[j+1]:
+			frames = len(arr) - j
+			break
+
+	print(frames, " arr ", [int(x) for x in arr[-140:]], " ang ", int(angin))
 
 	return frames
+
 
 def scan(ang):
 	angles.append(ang)
@@ -119,15 +135,14 @@ with open(path + fileOut, 'r') as fd:
 
 i = 1
 while i < len(ball_arr):
-
 	scan(ball_arr[i])
 
 	i += 1
 
-displayBefore = [x/5 for x in angles]
-displayAfter = trimSD(times)
+displayBefore = [x / 5 for x in angles]
+displayAfter = times # trimSD(times)
 plt.plot([x for x in range(len(displayBefore))], displayBefore, '.')
-plt.plot([x for x in range(len(displayAfter))], displayAfter, '.') # , plt.ylim([0, 50])
+plt.plot([x for x in range(len(displayAfter))], displayAfter, '.')  # , plt.ylim([0, 50])
 # plt.plot(times, [x/10 for x in angles[0:-1]], '-')
 
 plt.show()

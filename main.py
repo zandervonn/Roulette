@@ -150,7 +150,7 @@ def getAngle(point):
 	if ang != 45:
 		return ang
 	else:
-		return 0
+		return -1
 
 
 def key(k):

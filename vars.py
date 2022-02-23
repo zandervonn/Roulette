@@ -27,3 +27,10 @@ on = False
 best_fit_final = np.poly1d([1.915e-09, - 1.996e-06, 0.0006397, 0.04803, 10.59])
 drop_speed_final = 65.471835446875
 target_velocities = [12.90, 15.0, 16.0, 16.73, 18.0, 21, 26.0, 29, 35, 37.06, 37.87, 51.73, 65.0]
+
+#start fall stop fallang
+START = 0
+FALL = 1
+STOP = 2
+FALL_ANG = 3
+KeyVals = [20,537,627,75.96] #spin3

@@ -88,18 +88,18 @@ def scan(ang):
 	velocities.append(frames)
 
 
-with open(path + fileOut, 'r') as fd:
-	for row in fd:
-		lines = row.split(',')
-		lines = lines[0:-1]
-		lines = [float(x[1:-1]) for x in lines]
-		ball_arr = ball_arr + lines
-
-
-i = 1
-while i < len(ball_arr):
-	scan(ball_arr[i])
-
-	i += 1
-
-time_total = times[len(times)-1]
+# with open(path + arrFileOut, 'r') as fd:
+# 	for row in fd:
+# 		lines = row.split(',')
+# 		lines = lines[0:-1]
+# 		lines = [float(x[1:-1]) for x in lines]
+# 		ball_arr = ball_arr + lines
+#
+#
+# i = 1
+# while i < len(ball_arr):
+# 	scan(ball_arr[i])
+#
+# 	i += 1
+#
+# time_total = times[len(times)-1]

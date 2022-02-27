@@ -187,7 +187,7 @@ def main():
 		write(angles)
 
 	else:
-		with open(path + fileOut, 'r') as fd:
+		with open(path + arrFileOut, 'r') as fd:
 			for row in fd:
 				lines = row.split(',')
 				lines = lines[0:-1]
@@ -230,7 +230,7 @@ def main():
 
 	plt.show()
 
-main()
+# main()
 
 # for any point x
 #   v = for all x-1 to x-k

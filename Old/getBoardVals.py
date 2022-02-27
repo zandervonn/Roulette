@@ -68,39 +68,39 @@ def scan(ang):
 	velocities.append(frames)
 
 
-with open(path + fileOut, 'r') as fd:
-	for row in fd:
-		lines = row.split(',')
-		lines = lines[0:-1]
-		lines = [float(x[1:-1]) for x in lines]
-		ball_arr = ball_arr + lines
-
-
-i = 1
-while i < len(ball_arr):
-	scan(ball_arr[i])
-
-	i += 1
-
-#  get x and y of points
-times, displayBefore = getPairArrays(velocities)
-
-print(displayBefore)
-
-# display points
-# plt.plot([x for x in range(len(displayBefore))], trimEnds(displayBefore, times), '.')
-
-# get best fit
-best_fit = np.poly1d(np.polyfit(times, displayBefore, 4))
-
-# best_fit = best_fit_final
-print("Best fit:\t", best_fit , "\t/best fit")
-time_total = times[len(times)-1]
-
-# display points and best fit line
-xp = np.linspace(0, time_total, time_total)
-_ = plt.plot(times, displayBefore,  '.', xp, best_fit(xp))
-
-print("final speed= ", best_fit(time_total))
-
-plt.show()
+# with open(path + arrFileOut, 'r') as fd:
+# 	for row in fd:
+# 		lines = row.split(',')
+# 		lines = lines[0:-1]
+# 		lines = [float(x[1:-1]) for x in lines]
+# 		ball_arr = ball_arr + lines
+#
+#
+# i = 1
+# while i < len(ball_arr):
+# 	scan(ball_arr[i])
+#
+# 	i += 1
+#
+# #  get x and y of points
+# times, displayBefore = getPairArrays(velocities)
+#
+# print(displayBefore)
+#
+# # display points
+# # plt.plot([x for x in range(len(displayBefore))], trimEnds(displayBefore, times), '.')
+#
+# # get best fit
+# best_fit = np.poly1d(np.polyfit(times, displayBefore, 4))
+#
+# # best_fit = best_fit_final
+# print("Best fit:\t", best_fit , "\t/best fit")
+# time_total = times[len(times)-1]
+#
+# # display points and best fit line
+# xp = np.linspace(0, time_total, time_total)
+# _ = plt.plot(times, displayBefore,  '.', xp, best_fit(xp))
+#
+# print("final speed= ", best_fit(time_total))
+#
+# plt.show()

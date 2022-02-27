@@ -20,8 +20,8 @@ def get_frames():
 			break
 
 
-def write(arr):
-	text_file = open(path + fileOut, "w")
+def write(arr, pathOut):
+	text_file = open(path + pathOut, "w")
 	i = 1
 	for element in arr:
 
@@ -147,6 +147,7 @@ def getBall(tmp, last, frame):
 	return t_q
 
 
+# scan the video for key frames
 # a = forward
 # d = forward
 # r = stop
@@ -169,6 +170,7 @@ def getKeyFrames():
 		if key == ord('r'): break
 
 
+# get the list of angles of the ball for the scanned video
 def getAngles():
 	get_frames()
 
@@ -191,6 +193,7 @@ def getAngles():
 		i = i + 1
 
 	print("fall angle: ", angles[-1:][0])
-	write(angles)
+	write(angles, arrFileOut)
 
-getAngles()
+
+# getAngles()

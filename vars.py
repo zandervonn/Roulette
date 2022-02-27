@@ -8,7 +8,9 @@ import matplotlib.pyplot as plt
 path = "C:\\Users\\Zander\\IdeaProjects\\roulette2\\Resources\\"
 # path = "C:\\Users\\Zander\\Desktop\\roulette\\resources\\"
 fileIn = "spin3"
-fileOut = "outputArr.txt"
+arrFileOut = "outAnglesArr.txt"
+velFileOut = "outVelocitiesArr.txt"
+mapFileOut = "outMappingArr.txt"
 extension = ".mp4"
 
 e = 2.71828

@@ -72,10 +72,12 @@ def scanAngles():
 	i = 1
 	while i < len(anglesArrTemp):
 		angles.append(anglesArrTemp[i])
-		frames = timeForRev(angles, anglesArrTemp[i])
+		num_of_frames = timeForRev(angles, anglesArrTemp[i])
+
+		revolution = anglesArrTemp[:-num_of_frames]
 
 		# write the velocities to arr
-		velocities.append(frames)
+		velocities.append(num_of_frames)
 
 		setupVideo.write(velocities, velFileOut)
 
@@ -106,7 +108,8 @@ def mapVelToAngles():
 	i = 0
 	for item in map_v2a:
 		# print(item, ' = ', map_v2a[item])
-		arr_map.append((item, map_v2a[item]))
+
+		arr_map.append(str(item) + "=" + str(map_v2a[item]))
 		i += 0
 
 	setupVideo.write(arr_map, mapFileOut)

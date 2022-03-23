@@ -174,11 +174,11 @@ def getKeyFrames():
 def getAngles():
 	get_frames()
 
-	#load key frames
+	# load key frames
 	f_start = KeyVals[START]
 	f_fall = KeyVals[FALL]
 
-	#scan in key frames to get list of angles
+	# scan in key frames to get list of angles
 	i = f_start
 	while i <= f_fall:
 		vid[i].copy()

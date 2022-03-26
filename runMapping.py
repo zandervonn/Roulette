@@ -226,4 +226,4 @@ def getFallPoint():
 
 
 
-getFallPoint()
+# getFallPoint()

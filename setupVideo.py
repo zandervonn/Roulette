@@ -86,12 +86,12 @@ def getBall(tmp, last, frame):
 	subbed = cv2.circle(subbed, center, inner, (0, 0, 0), -1)
 	subbed = cv2.subtract(subbed, last)  # get change between frames (moving)
 
-	# convert to grey, blue to get bigger items, get brightest point
+	# convert to grey, blue to get bigger items, get the brightest point
 	subbed = cv2.cvtColor(subbed, cv2.COLOR_RGB2GRAY)
 	subbed = cv2.GaussianBlur(subbed, (21, 21), 0)
 	limit = subbed.max()
 
-	# rangeT from brightest point that may be ball
+	# rangeT from the brightest point that may be the ball
 	range_t = 20
 
 	if limit < 7:

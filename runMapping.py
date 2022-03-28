@@ -1,5 +1,3 @@
-from numpy import average
-
 from vars import *
 
 cap = cv2.VideoCapture(path + fileIn + extension)
@@ -137,6 +135,22 @@ def getAngle(point):
 		return -1
 
 
+def getPoint(angle):
+
+	# angle = (angle+180) % 360
+
+	length = 200
+	c_x = center[0]
+	c_y = center[1]
+
+	x = round(c_x + length * math.sin(angle * math.pi / 180.0))
+	y = round(c_y + length * math.cos(angle * math.pi / 180.0))
+
+	P2 = (x, y)
+
+	return P2
+
+
 def getVelocity(ang, last_ang):
 	# get distance between angles
 	dif = ((((ang - last_ang) % 360) + 540) % 360) - 180
@@ -162,14 +176,15 @@ def read(readFile):
 	for x in arr:
 		y = x.split('=')
 		if len(y) == 2:
-			z = [0,0]
+			z = [0, 0]
 			z[0] = int(y[0])
 			z[1] = float(y[1])
 			mapping2d.append(z)
 		mapping2d.sort()
-	print(mapping2d)
+	# print(mapping2d)
 
 	return mapping2d
+
 
 mapping = read(mapFileOut)
 
@@ -182,48 +197,73 @@ def getExpectedFromMap(vel):
 	return 0
 
 
+def getAverageAngle(arr):
+	x = y = 0
+	for angle in arr:
+		angle = math.radians(angle)
+		x += math.cos(angle)
+		y += math.sin(angle)
+
+	average_angle = math.degrees(math.atan2(y, x)) % 360
+
+	return average_angle
+
+
 def getFallPoint():
 	print("guessing on: " + fileIn)
 
 	get_frames()
 
-	fall_points=[]
+	fall_points = []
 	last_ang = 0
 	i_max = len(orgVid)
 	i = 0
+
+	f_start = KeyVals[START]
+	f_fall = KeyVals[FALL]
+
 	# for each frame
-	while True:
-		if i < 0: i = 0
-		if i > i_max: i = i_max
+	j = 1
+	i = f_start
+	while i <= f_fall:
 
 		# get ball
 		vid[i].copy()
+
 		b = getBall(vid[i], vid[i - 1], i + 1)
 		cv2.circle(orgVid[i], (int(b[0]), int(b[1])), 5, (100, 255, 50), -1)
 
 		# get angle
 		ang = getAngle(b)
 
-		# get vel = diff from last angle
-		vel = getVelocity(ang, last_ang)
-		last_ang = ang
+		if ang == -1:
+			j += 1
+			print("skip frame: ", i)
+		else:
 
-		# get expected landing = mapping: angle + difference
-		fall_point_frame = getExpectedFromMap(vel)
-		fall_points.append(fall_point_frame)
+			# get vel = diff from last angle
+			vel = getVelocity(ang, last_ang) / j
+			last_ang = ang
 
-		# draw calculated landing for frame
-		print("frame ", i, " guess: ", fall_point_frame)
-		# draw average guess
+			# get expected landing = mapping: angle + difference
+			fall_point_frame = getExpectedFromMap(vel)
+			fall_points.append(fall_point_frame)
 
-		print("average guess: ", average(fall_points))
-		# cv2.imshow("Display", orgVid[i])
-		i+=1
+			# draw calculated landing for frame
+			# print("frame ", i, " guess: ", fall_point_frame)
+			# draw average guess
+
+			j = 1
+
+		averageAngle = getAverageAngle(fall_points)
+		# print("average guess: ", averageAngle)
+
+		cv2.circle(orgVid[i], getPoint(averageAngle), 3, (100, 20, 50), -1)
+		cv2.imshow("Display", orgVid[i])
+		cv2.waitKey(30)  # frame rate
+
+		i += 1
 
 
+getFallPoint()
 
-
-
-
-
-# getFallPoint()

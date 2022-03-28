@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # Finals
 path = "C:\\Users\\Zander\\IdeaProjects\\roulette2\\Resources\\"
 # path = "C:\\Users\\Zander\\Desktop\\roulette\\resources\\"
-fileIn = "spin3"
+fileIn = "spin4"
 arrFileOut = "outAnglesArr.txt"
 velFileOut = "outVelocitiesArr.txt"
 mapFileOut = "outMappingArr.txt"
@@ -35,4 +35,9 @@ START = 0
 FALL = 1
 STOP = 2
 FALL_ANG = 3
-KeyVals = [20,537,627,75.96] #spin3
+CLOCKWISE = 4
+
+if fileIn == "spin3": KeyVals = [20, 537, 627, 75.96, 0]
+if fileIn == "spin4": KeyVals = [20, 537, 627, 75.96, True] #guess
+if fileIn == "spin5": KeyVals = [69, 599, 687, 0.00000, 0]
+if fileIn == "spin7": KeyVals = [35, 617, 679, 100.00000, 0]

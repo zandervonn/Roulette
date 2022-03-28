@@ -1,3 +1,5 @@
+import numpy
+
 from vars import *
 
 cap = cv2.VideoCapture(path + fileIn + extension)
@@ -25,6 +27,7 @@ def write(arr, pathOut):
 	i = 1
 	for element in arr:
 
+		numpy.set_printoptions(threshold=np.inf)  # to not truncate array
 		text_file.write('[' + str(element) + '],')
 		if i % 4 == 0:
 			text_file.write('\n')
@@ -148,7 +151,7 @@ def getBall(tmp, last, frame):
 
 
 # scan the video for key frames
-# a = forward
+# a = backward
 # d = forward
 # r = stop
 # w = capture frame
@@ -196,4 +199,4 @@ def getAngles():
 	write(angles, arrFileOut)
 
 
-# getAngles()
+# getKeyFrames()

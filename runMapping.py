@@ -1,3 +1,5 @@
+import numpy
+
 from vars import *
 
 cap = cv2.VideoCapture(path + fileIn + extension)
@@ -181,7 +183,6 @@ def read(readFile):
 			z[1] = float(y[1])
 			mapping2d.append(z)
 		mapping2d.sort()
-	# print(mapping2d)
 
 	return mapping2d
 
@@ -191,10 +192,36 @@ mapping = read(mapFileOut)
 
 def getExpectedFromMap(vel):
 
+	i = 0
 	for x in mapping:
+		avg_range = 5
+		sd_range = 10
+
+		sd_around_i = mapping[i-sd_range:i+sd_range]
+		average_around_i = mapping[i-avg_range:i+avg_range]
+
+
 		if x[0] > vel:
 			return x[1]
+		i += 1
 	return 0
+
+
+def getSDWeightedAverage(arr, sd):
+
+	flat_average = numpy.average(arr)
+	weights = []
+	for x in arr:
+		weights.append(-((x - flat_average)/sd)**2)
+
+	weighted_avg = np.average(arr, weights=weights)
+
+	print(weights)
+	print(arr)
+	print(weighted_avg)
+
+	return weighted_avg
+
 
 
 def getAverageAngle(arr):
@@ -229,6 +256,11 @@ def getFallPoint():
 
 		# get ball
 		vid[i].copy()
+
+		# not working
+		if KeyVals[CLOCKWISE]:
+			vid[i] = cv2.flip(vid[i], 1)
+			orgVid[i] = cv2.flip(orgVid[i], 1)
 
 		b = getBall(vid[i], vid[i - 1], i + 1)
 		cv2.circle(orgVid[i], (int(b[0]), int(b[1])), 5, (100, 255, 50), -1)
@@ -265,5 +297,4 @@ def getFallPoint():
 		i += 1
 
 
-getFallPoint()
-
+# getFallPoint()

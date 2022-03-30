@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # Finals
 path = "C:\\Users\\Zander\\IdeaProjects\\roulette2\\Resources\\"
 # path = "C:\\Users\\Zander\\Desktop\\roulette\\resources\\"
-fileIn = "spin4"
+fileIn = "spin5"
 arrFileOut = "outAnglesArr.txt"
 velFileOut = "outVelocitiesArr.txt"
 mapFileOut = "outMappingArr.txt"

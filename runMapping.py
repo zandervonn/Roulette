@@ -254,32 +254,33 @@ def getFallPoint():
 	i = f_start
 	while i <= f_fall:
 
-		# get ball
-		vid[i].copy()
-
-		# not working
-		if KeyVals[CLOCKWISE]:
-			vid[i] = cv2.flip(vid[i], 1)
-			orgVid[i] = cv2.flip(orgVid[i], 1)
-
 		b = getBall(vid[i], vid[i - 1], i + 1)
-		cv2.circle(orgVid[i], (int(b[0]), int(b[1])), 5, (100, 255, 50), -1)
+		cv2.circle(vid[i], (int(b[0]), int(b[1])), 5, (100, 255, 50), -1)
 
 		# get angle
 		ang = getAngle(b)
 
 		if ang == -1:
 			j += 1
-			print("skip frame: ", i)
+			# print("skip frame: ", i)
 		else:
 
 			# get vel = diff from last angle
-			vel = getVelocity(ang, last_ang) / j
+			if KeyVals[CLOCKWISE]:
+				vel = getVelocity(last_ang, ang) / j
+			else:
+				vel = getVelocity(ang, last_ang) / j
 			last_ang = ang
 
 			# get expected landing = mapping: angle + difference
 			fall_point_frame = getExpectedFromMap(vel)
-			fall_points.append(fall_point_frame)
+			if fall_point_frame > 0:
+				fall_points.append(fall_point_frame)
+
+			print("---------------------------------")
+			print("angle: ", ang)
+			print("velocity: ", vel)
+			print("fall point guess", fall_point_frame)
 
 			# draw calculated landing for frame
 			# print("frame ", i, " guess: ", fall_point_frame)
@@ -288,13 +289,16 @@ def getFallPoint():
 			j = 1
 
 		averageAngle = getAverageAngle(fall_points)
+		print("average angle:", averageAngle)
+
+
 		# print("average guess: ", averageAngle)
 
-		cv2.circle(orgVid[i], getPoint(averageAngle), 3, (100, 20, 50), -1)
-		cv2.imshow("Display", orgVid[i])
+		cv2.circle(vid[i], getPoint(averageAngle), 3, (100, 20, 50), -1)
+		cv2.imshow("Display", vid[i])
 		cv2.waitKey(30)  # frame rate
 
 		i += 1
+	print(fall_points)
 
-
-# getFallPoint()
+getFallPoint()

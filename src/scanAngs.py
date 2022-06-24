@@ -74,8 +74,6 @@ def scanAngles():
 		angles.append(anglesArrTemp[i])
 		num_of_frames = timeForRev(angles, anglesArrTemp[i])
 
-		revolution = anglesArrTemp[:-num_of_frames]
-
 		# write the velocities to arr
 		velocities.append(num_of_frames)
 

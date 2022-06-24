@@ -1,4 +1,4 @@
-from vars import *
+from src.vars import *
 
 angles = []
 velocities = []

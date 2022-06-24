@@ -1,6 +1,3 @@
-from vars import *
-import matplotlib.pyplot as plt
-
 angles = []
 velocities = []
 

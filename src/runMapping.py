@@ -1,5 +1,3 @@
-import numpy
-
 from vars import *
 
 cap = cv2.VideoCapture(path + fileIn + extension)
@@ -129,7 +127,7 @@ def getAngle(point):
 	x = x - c_x
 	y = y - c_y
 
-	ang = 180 + (180 * (math.atan2(x, y) / math.pi))
+	ang = 180 * (math.atan2(x, y) / math.pi)
 
 	if ang != 45:
 		return ang
@@ -153,13 +151,14 @@ def getPoint(angle):
 	return P2
 
 
+#frames per revolution
 def getVelocity(ang, last_ang):
 	# get distance between angles
 	dif = ((((ang - last_ang) % 360) + 540) % 360) - 180
 
-	# 360 / diff = frames for revolution?? may show diff speed than scan arr produces
 	# (int)*100 for accuracy used
-	if dif == 0: return 0
+	if dif == 0:
+		return 0
 	vel = int((360 / dif) * 100)
 
 	return vel
@@ -187,29 +186,28 @@ def read(readFile):
 	return mapping2d
 
 
-mapping = read(mapFileOut)
-
-
 def getExpectedFromMap(vel):
 
 	i = 0
-	for x in mapping:
-		avg_range = 5
-		sd_range = 10
+	while i < len(mapping):
+		if mapping[i][0] > vel:
 
-		sd_around_i = mapping[i-sd_range:i+sd_range]
-		average_around_i = mapping[i-avg_range:i+avg_range]
+			return mapping[i][0]
 
-
-		if x[0] > vel:
-			return x[1]
 		i += 1
 	return 0
 
 
+def arrayToPlot(arr):
+	x = np.array([-(len(arr) - x) for x in range(len(arr))])
+	plt.plot(x, arr, '.')
+	plt.show()
+
+
+
 def getSDWeightedAverage(arr, sd):
 
-	flat_average = numpy.average(arr)
+	flat_average = np.average(arr)
 	weights = []
 	for x in arr:
 		weights.append(-((x - flat_average)/sd)**2)
@@ -221,7 +219,6 @@ def getSDWeightedAverage(arr, sd):
 	print(weighted_avg)
 
 	return weighted_avg
-
 
 
 def getAverageAngle(arr):
@@ -262,7 +259,7 @@ def getFallPoint():
 
 		if ang == -1:
 			j += 1
-			# print("skip frame: ", i)
+		# print("skip frame: ", i)
 		else:
 
 			# get vel = diff from last angle
@@ -274,26 +271,23 @@ def getFallPoint():
 
 			# get expected landing = mapping: angle + difference
 			fall_point_frame = getExpectedFromMap(vel)
+			fall_point_frame_guess = (fall_point_frame + ang) % 360
 			if fall_point_frame > 0:
-				fall_points.append(fall_point_frame)
+				fall_points.append(fall_point_frame_guess)
 
 			print("---------------------------------")
 			print("angle: ", ang)
 			print("velocity: ", vel)
-			print("fall point guess", fall_point_frame)
-
-			# draw calculated landing for frame
-			# print("frame ", i, " guess: ", fall_point_frame)
-			# draw average guess
+			print("fall point guess", fall_point_frame_guess)
 
 			j = 1
 
 		averageAngle = getAverageAngle(fall_points)
 		print("average angle:", averageAngle)
 
-
 		# print("average guess: ", averageAngle)
 
+		cv2.circle(vid[i], getPoint(90), 3, (255, 0, 0), -1)
 		cv2.circle(vid[i], getPoint(averageAngle), 3, (100, 20, 50), -1)
 		cv2.imshow("Display", vid[i])
 		cv2.waitKey(30)  # frame rate
@@ -301,4 +295,10 @@ def getFallPoint():
 		i += 1
 	print(fall_points)
 
+
+mapping = read(mapFileOut)
+
 getFallPoint()
+
+# arrayToPlot([x[0] for x in mapping])
+

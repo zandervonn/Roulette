@@ -1,5 +1,5 @@
 
-from vars import *
+from src.vars import *
 
 cap = cv2.VideoCapture(path + fileIn + extension)
 

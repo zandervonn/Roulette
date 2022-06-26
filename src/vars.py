@@ -5,8 +5,7 @@ import math
 import matplotlib.pyplot as plt
 
 # Finals
-path = "./Resources\\"
-# path = "C:\\Users\\Zander\\Desktop\\roulette\\Resources\\"
+path = "C:\\Users\\Zander\\Desktop\\roulette2\\Resources\\"
 fileIn = "spin5"
 arrFileOut = "outAnglesArr.txt"
 velFileOut = "outVelocitiesArr.txt"

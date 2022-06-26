@@ -78,6 +78,44 @@ def getAngle(point):
 		return -1
 
 
+def get_clockwise_point(contour):
+	t_p = (0, 0)
+	t_a = 360
+	maxContourArc = 180
+
+	# get list of angles in contour
+	cont_angs = []
+	for x in contour:
+		point = x[0]
+		cont_angs.append(getAngle(point))
+
+	# if angles are at both sides of 360, you are at the top of the circle
+	top = False
+	sorted_angs = sorted(cont_angs)
+	if len(sorted_angs) > 0 and sorted_angs[0] < 360-maxContourArc and sorted_angs[-1] > 0+maxContourArc:
+		top = True
+
+	# for all points in contour
+	for x in contour:
+		point = x[0]
+		a = getAngle(point)
+		# if ball at top get only clockwise points
+		if top and maxContourArc < a < t_a:
+			t_p = point
+			t_a = a
+		# otherwise check all points
+		elif not top and a < t_a:
+			t_p = point
+			t_a = a
+
+	# if t_p value is invalid
+	if not t_p[1] > 0:
+		t_p = (0, 0)
+		t_a = 360
+
+	return t_a, t_p
+
+
 def getBall(tmp, last, frame):
 	global timer, ball_arr, times, on
 
@@ -110,25 +148,16 @@ def getBall(tmp, last, frame):
 	cv2.findNonZero(subbed)  # list of all non 0 points
 	contours, hierarchy = cv2.findContours(subbed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)  # biggest non zero area
 
-	c = []
+	contour = []
 	if len(contours) != 0:
-		# draw in blue the contours that were founded
-		cv2.drawContours(subbed, contours, -1, 255, 3)
-
 		# find the biggest contour (c) by the area
-		c = max(contours, key=cv2.contourArea)
+		contour = max(contours, key=cv2.contourArea)
 
-	t_q = (0, 0)
-	t_a = 360
+	t_a, t_p = get_clockwise_point(contour)
 
 	# get farthest clockwise point in contour = t _ a
-	if c is not None and len(c) > 1:
-		for x in c:
-			for p in x:
-				a = getAngle(p)
-				if a < t_a:
-					t_q = p
-					t_a = a
+	if contour is not None and len(contour) > 1:
+		t_a, t_q = get_clockwise_point(contour)
 
 		angles.append(t_a)
 		# get when the ball first crosses into angles
@@ -147,7 +176,7 @@ def getBall(tmp, last, frame):
 		else:
 			on = False
 
-	return t_q
+	return t_p
 
 
 # scan the video for key frames
@@ -199,4 +228,4 @@ def getAngles():
 	write(angles, arrFileOut)
 
 
-# getKeyFrames()
+get_frames()

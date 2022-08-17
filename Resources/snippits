@@ -252,3 +252,23 @@ def trimSD(arr):
 		i += 10
 
 	return out
+
+
+
+
+	#### I think this was to calc time for revolution, but it isnt doing anything now
+			# # get when the ball first crosses into angles
+    		# lower = 200
+    		# upper = 359
+    		# if lower < t_a < upper:
+    		# 	if not on:
+    		# 		ttt = (frame * fRate) - times[-1:][0]
+    		# 		mod = (t_a / 360) - (lower / 360)
+    		# 		out = ttt + (ttt * mod)  # time + 1.x, x% way past 180
+    		# 		ball_arr.append(out)
+    		# 		times.append(frame * fRate)
+    		#
+    		# 	on = True
+    		#
+    		# else:
+    		# 	on = False

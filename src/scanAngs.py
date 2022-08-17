@@ -42,6 +42,21 @@ def timeForRev(arr, angin):
 
 	return frames
 
+def timeForRev2(arr, angin):
+	frames = -1
+
+	if len(arr) < 2:
+		return -1
+
+
+	for i in range(len(arr)-1):
+		if arr[i-len(arr)] != -1 and arr[i-len(arr)+1] != -1:
+			if arr[i-len(arr)] <= angin < arr[i-len(arr)+1]:
+				frames = len(arr) - i
+				break
+
+
+	return frames
 
 def hasValInRange(lower, arr, upper):
 	for x in arr:

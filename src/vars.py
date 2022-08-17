@@ -12,6 +12,8 @@ velFileOut = "outVelocitiesArr.txt"
 mapFileOut = "outMappingArr.txt"
 extension = ".mp4"
 
+mapping = []
+
 e = 2.71828
 center = (550, 360)
 fRate = 30

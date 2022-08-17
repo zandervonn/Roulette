@@ -116,8 +116,7 @@ def get_clockwise_point(contour):
 	return t_a, t_p
 
 
-def getBall(tmp, last, frame):
-	global timer, ball_arr, times, on
+def getBall(tmp, last):
 
 	subbed = tmp
 	height, width, z = tmp.shape
@@ -158,23 +157,7 @@ def getBall(tmp, last, frame):
 	# get farthest clockwise point in contour = t _ a
 	if contour is not None and len(contour) > 1:
 		t_a, t_q = get_clockwise_point(contour)
-
 		angles.append(t_a)
-		# get when the ball first crosses into angles
-		lower = 200
-		upper = 359
-		if lower < t_a < upper:
-			if not on:
-				ttt = (frame * fRate) - times[-1:][0]
-				mod = (t_a / 360) - (lower / 360)
-				out = ttt + (ttt * mod)  # time + 1.x, x% way past 180
-				ball_arr.append(out)
-				times.append(frame * fRate)
-
-			on = True
-
-		else:
-			on = False
 
 	return t_p
 
@@ -215,7 +198,7 @@ def getAngles():
 	while i <= f_fall:
 		vid[i].copy()
 
-		b = getBall(vid[i], vid[i - 1], i + 1)
+		b = getBall(vid[i], vid[i - 1])
 
 		cv2.circle(orgVid[i], (int(b[0]), int(b[1])), 5, (100, 255, 50), -1)
 
@@ -228,4 +211,4 @@ def getAngles():
 	write(angles, arrFileOut)
 
 
-get_frames()
+# get_frames()

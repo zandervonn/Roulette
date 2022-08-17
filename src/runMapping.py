@@ -295,10 +295,9 @@ def getFallPoint():
 		i += 1
 	print(fall_points)
 
-
-mapping = read(mapFileOut)
-
-getFallPoint()
+# turn these two on to run mapping vv
+# mapping = read(mapFileOut)
+# getFallPoint()
 
 # arrayToPlot([x[0] for x in mapping])
 

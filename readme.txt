@@ -1,3 +1,6 @@
+A project to track and predict where a ball in Roulette will fall. 
+Given a video in, it uses OpenCv to track the ball, which predicts the velocity, which can then be mapped to an expected fall location. 
+
 how to use:
 -use setupVideo.getKeyFrames() to get the key frames [start,fall,stop]
 -use setupVideo.getAngles to get an out mapping arr of all the angles recorded in the spin between key frames
